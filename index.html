@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesens V3 — набор бета-тестеров</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Consolas', 'Courier New', monospace;
+    }
+
+    body {
+        background: #0a0a0a;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .window {
+        width: 720px;
+        max-width: 100%;
+        background: #1e1e1e;
+        border: 1px solid #3a3a3a;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+        position: relative;
+    }
+
+    .orange-line {
+        height: 3px;
+        background: linear-gradient(90deg, #c85a00, #ff9a00, #c85a00);
+        width: 100%;
+    }
+
+    .content {
+        padding: 20px 25px 25px 25px;
+    }
+
+    .game-header {
+        display: flex;
+        gap: 15px;
+        background: #252525;
+        padding: 12px 15px;
+        border: 1px solid #3a3a3a;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    .logo-svg {
+        width: 52px;
+        height: 52px;
+        background: #2c2c2c;
+        border: 1px solid #3a3a3a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .game-title h2 {
+        color: #ff9a00;
+        font-size: 18px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
+
+    .game-title .small {
+        color: #7a7a7a;
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    .options-header {
+        background: #252525;
+        border: 1px solid #3a3a3a;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .options-header span {
+        color: #c0c0c0;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .options-header .close {
+        color: #585858;
+        font-size: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #c0c0c0;
+        font-size: 12px;
+        margin-bottom: 4px;
+        letter-spacing: 0.3px;
+    }
+
+    .form-group label span.req {
+        color: #cc4444;
+        margin-left: 2px;
+    }
+
+    .hint {
+        color: #6b6b6b;
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+    .charcount {
+        color: #6b6b6b;
+        font-size: 10px;
+        margin-top: 3px;
+        text-align: right;
+    }
+
+    .charcount.ok { color: #7dc253; }
+    .charcount.bad { color: #cc4444; }
+
+    input, textarea {
+        width: 100%;
+        background: #2c2c2c;
+        border: 1px solid #3a3a3a;
+        color: #e0e0e0;
+        font-size: 12px;
+        padding: 9px 10px;
+        outline: none;
+        transition: all 0.2s;
+        font-family: 'Consolas', monospace;
+    }
+
+    input:focus, textarea:focus {
+        border-color: #e07b00;
+        background: #2a2a2a;
+    }
+
+    textarea {
+        min-height: 90px;
+        resize: vertical;
+    }
+
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 18px 0 20px;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: #e07b00;
+        background: #2c2c2c;
+        border: 1px solid #3a3a3a;
+    }
+
+    .checkbox-row label {
+        color: #8a8a8a;
+        font-size: 11px;
+    }
+
+    .button-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn {
+        flex: 1;
+        background: #2c2c2c;
+        border: 1px solid #3a3a3a;
+        color: #c0c0c0;
+        font-size: 12px;
+        padding: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: 'Consolas', monospace;
+        text-align: center;
+    }
+
+    .btn:hover {
+        background: #363636;
+        border-color: #e07b00;
+        color: white;
+    }
+
+    .btn:active {
+        background: #1a1a1a;
+    }
+
+    .btn.primary {
+        border-color: #c85a00;
+        color: #ffb84d;
+    }
+
+    .btn.primary:hover {
+        background: #3a2a1a;
+        border-color: #ff9a00;
+        color: #fff;
+    }
+
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .status-panel {
+        margin-top: 20px;
+        background: #1e1e1e;
+        border: 1px solid #3a3a3a;
+        padding: 10px 12px;
+        min-height: 50px;
+    }
+
+    .status-header {
+        color: #c0c0c0;
+        font-size: 10px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+
+    #status {
+        color: #a0a0a0;
+        font-size: 11px;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+    .status-success { color: #7dc253 !important; }
+    .status-error { color: #cc4444 !important; }
+    .status-warning { color: #c8b400 !important; }
+
+    .separator {
+        height: 1px;
+        background: #3a3a3a;
+        margin: 15px 0 10px;
+    }
+
+    .footer-note {
+        color: #585858;
+        font-size: 9px;
+        text-align: right;
+        margin-top: 5px;
+    }
+</style>
+</head>
+<body>
+<div class="window">
+    <div class="orange-line"></div>
+    <div class="content">
+
+        <div class="game-header">
+            <div class="logo-svg">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="#e07b00"/>
+                    <circle cx="12" cy="12" r="5" fill="#c85a00"/>
+                    <path d="M12 8v8M8 12h8" stroke="#1e1e1e" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <div class="game-title">
+                <h2>MESENS V3</h2>
+                <div class="small">набор бета-тестеров</div>
+            </div>
+        </div>
+
+        <div class="options-header">
+            <span>🔹 анкета тестера</span>
+            <div class="close">⨯</div>
+        </div>
+
+        <form id="applicationForm" onsubmit="return false;">
+
+            <div class="form-group">
+                <label>Ваш Telegram юзернейм <span class="req">*</span></label>
+                <input type="text" id="telegram" placeholder="@username" required>
+            </div>
+
+            <div class="form-group">
+                <label>Что вы хотите видеть в Mesens V3? <span class="req">*</span></label>
+                <textarea id="q1" placeholder="Опишите подробно, минимум 50 символов..." required oninput="updateCount('q1','c1')"></textarea>
+                <div class="charcount" id="c1">0 / 50</div>
+            </div>
+
+            <div class="form-group">
+                <label>Что бы вы хотели, чтобы перешло в Mesens V3 из Mesens V2? <span class="req">*</span></label>
+                <textarea id="q2" placeholder="Опишите подробно, минимум 50 символов..." required oninput="updateCount('q2','c2')"></textarea>
+                <div class="charcount" id="c2">0 / 50</div>
+            </div>
+
+            <div class="form-group">
+                <label>Доп. комментарий (необязательно)</label>
+                <textarea id="q3" placeholder="Любые дополнительные мысли..."></textarea>
+            </div>
+
+            <div class="checkbox-row">
+                <input type="checkbox" id="agree" checked>
+                <label for="agree">Согласен(на), что решение по заявке принимает администрация</label>
+            </div>
+
+            <div class="button-row">
+                <button type="button" class="btn primary" id="submitBtn" onclick="submitApplication()">Отправить заявку</button>
+                <button type="button" class="btn" onclick="document.getElementById('applicationForm').reset(); updateCount('q1','c1'); updateCount('q2','c2');">Сброс</button>
+            </div>
+        </form>
+
+        <div class="status-panel">
+            <div class="status-header">📋 status</div>
+            <div id="status">Ожидание ввода данных...</div>
+        </div>
+
+        <div class="separator"></div>
+        <div class="footer-note">Mesens beta intake · v1.0 · заявки обрабатываются автоматически</div>
+    </div>
+</div>
+
+<script>
+    const OWNER = 'aicesk12124';
+    const REPO = 'MesensV3-testers';
+    const MIN_LEN = 50;
+
+    function updateCount(fieldId, countId) {
+        const val = document.getElementById(fieldId).value.trim();
+        const el = document.getElementById(countId);
+        el.textContent = `${val.length} / ${MIN_LEN}`;
+        el.className = 'charcount ' + (val.length >= MIN_LEN ? 'ok' : 'bad');
+    }
+
+    function setStatus(message, type = 'info') {
+        const statusEl = document.getElementById('status');
+        statusEl.textContent = message;
+        statusEl.className = '';
+        if (type === 'success') statusEl.classList.add('status-success');
+        else if (type === 'error') statusEl.classList.add('status-error');
+        else if (type === 'warning') statusEl.classList.add('status-warning');
+    }
+
+    function submitApplication() {
+        const telegram = document.getElementById('telegram').value.trim();
+        const q1 = document.getElementById('q1').value.trim();
+        const q2 = document.getElementById('q2').value.trim();
+        const q3 = document.getElementById('q3').value.trim();
+        const agree = document.getElementById('agree').checked;
+
+        if (!telegram) {
+            setStatus('❌ Укажите ваш Telegram юзернейм', 'error');
+            return;
+        }
+        if (q1.length < MIN_LEN) {
+            setStatus(`❌ Ответ на первый вопрос слишком короткий (нужно минимум ${MIN_LEN} символов)`, 'error');
+            return;
+        }
+        if (q2.length < MIN_LEN) {
+            setStatus(`❌ Ответ на второй вопрос слишком короткий (нужно минимум ${MIN_LEN} символов)`, 'error');
+            return;
+        }
+        if (!agree) {
+            setStatus('❌ Необходимо согласие', 'error');
+            return;
+        }
+
+        setStatus('🔄 Открываем GitHub для подтверждения заявки...', 'warning');
+
+        const title = `Заявка от ${telegram}`;
+        const body =
+`### Telegram
+${telegram}
+
+### Что вы хотите видеть в Mesens V3
+${q1}
+
+### Что перенести из Mesens V2
+${q2}
+
+### Доп. комментарий
+${q3 || '-'}`;
+
+        const url = `https://github.com/${OWNER}/${REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=beta-application`;
+
+        window.open(url, '_blank');
+        setStatus('✅ Заявка сформирована. Подтвердите отправку в открывшейся вкладке GitHub (кнопка "Submit new issue"). Понадобится GitHub-аккаунт.', 'success');
+    }
+</script>
+</body>
+</html>
