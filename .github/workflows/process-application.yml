@@ -1,0 +1,53 @@
+name: Process beta application
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  process:
+    if: contains(github.event.issue.labels.*.name, 'beta-application')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Classify and file application
+        id: classify
+        run: python3 scripts/classify.py
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+      - name: Commit result
+        run: |
+          git config user.name "beta-intake-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add beters badrequest
+          git commit -m "Заявка #${{ github.event.issue.number }}: ${{ steps.classify.outputs.verdict }}" || echo "nothing to commit"
+          git push
+
+      - name: Comment and close issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const verdict = "${{ steps.classify.outputs.verdict }}";
+            const path = "${{ steps.classify.outputs.path }}";
+            const body = verdict === "good"
+              ? `✅ Заявка принята и сохранена: \`${path}\``
+              : `❌ Заявка отклонена как некорректная (пустой/слишком короткий/бессвязный ответ) и записана в \`${path}\``;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: "closed"
+            });
